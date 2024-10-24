@@ -1,6 +1,6 @@
 # WM8960 Audio HAT
 
-The drivers of [WM8960 Audio HAT] for Raspberry Pi.
+The drivers of [WM8960 Audio HAT] for Radxa RK356x (only tested on ZERO 3).
 
 http://www.waveshare.net/shop/WM8960-Audio-HAT.htm
 
@@ -13,6 +13,7 @@ Get the wm8960 soundcard source code. and install all linux kernel drivers
 git clone https://github.com/waveshare/WM8960-Audio-HAT
 cd WM8960-Audio-HAT
 sudo ./install.sh 
+rsetup # select Overlays - Install 3rd party overlay - wm8960-soundcard.dtbo
 sudo reboot
 ```
 
@@ -21,26 +22,14 @@ While the upstream wm8960 codec is not currently supported by current Pi kernel 
 Check that the sound card name matches the source code wm8960-soundcard.
 
 ```bash
-pi@raspberrypi:~ $ aplay -l
+radxa@radxa-zero3:~ $ aplay -l
 **** List of PLAYBACK Hardware Devices ****
-card 0: ALSA [bcm2835 ALSA], device 0: bcm2835 ALSA [bcm2835 ALSA]
-  Subdevices: 7/7
-  Subdevice #0: subdevice #0
-  Subdevice #1: subdevice #1
-  Subdevice #2: subdevice #2
-  Subdevice #3: subdevice #3
-  Subdevice #4: subdevice #4
-  Subdevice #5: subdevice #5
-  Subdevice #6: subdevice #6
-card 0: ALSA [bcm2835 ALSA], device 1: bcm2835 ALSA [bcm2835 IEC958/HDMI]
+card 1: wm8960soundcard [wm8960-soundcard], device 0: fe430000.i2s-wm8960-hifi wm8960-hifi-0 []
   Subdevices: 1/1
   Subdevice #0: subdevice #0
-card 1: wm8960soundcard [wm8960-soundcard], device 0: bcm2835-i2s-wm8960-hifi wm8960-hifi-0 []
-  Subdevices: 1/1
-  Subdevice #0: subdevice #0
-pi@raspberrypi:~ $ arecord -l
+radxa@radxa-zero3:~ $ arecord -l
 **** List of CAPTURE Hardware Devices ****
-card 1: wm8960soundcard [wm8960-soundcard], device 0: bcm2835-i2s-wm8960-hifi wm8960-hifi-0 []
+card 1: wm8960soundcard [wm8960-soundcard], device 0: fe430000.i2s-wm8960-hifi wm8960-hifi-0 []
   Subdevices: 1/1
   Subdevice #0: subdevice #0
 
@@ -69,11 +58,11 @@ aplay -D hw:1,0 test.wav
 If you want to upgrade the driver , you need uninstall the driver first.
 
 ```bash
-pi@raspberrypi:~/WM8960-Audio-HAT $ sudo ./uninstall.sh 
+radxa@radxa-zero3:~/WM8960-Audio-HAT $ sudo ./uninstall.sh 
 ...
 
 ------------------------------------------------------
-Please reboot your raspberry pi to apply all settings
+Please reboot your device to apply all settings
 Thank you!
 ------------------------------------------------------
 ```

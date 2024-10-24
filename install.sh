@@ -5,9 +5,9 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-is_Raspberry=$(cat /proc/device-tree/model | awk  '{print $1}')
-if [ "x${is_Raspberry}" != "xRaspberry" ] ; then
-  echo "Sorry, this drivers only works on raspberry pi"
+is_Radxa=$(cat /proc/device-tree/model | awk  '{print $1}')
+if [ "x${is_Radxa}" != "xRadxa" ] ; then
+  echo "Sorry, this drivers only works on Radxa"
   exit 1
 fi
 
@@ -19,8 +19,8 @@ ver="1.0"
 marker="0.0.0"
 
 apt update
-apt-get -y install raspberrypi-kernel-headers raspberrypi-kernel 
-apt-get -y install  dkms git i2c-tools libasound2-plugins
+apt-get -y install linux-headers-$(uname -r) #raspberrypi-kernel 
+apt-get -y install dkms git i2c-tools libasound2-plugins
 
 # locate currently installed kernels (may be different to running kernel if
 # it's just been updated)
@@ -50,8 +50,10 @@ function install_module {
 install_module "./" "wm8960-soundcard"
 
 # install dtbos
-cp wm8960-soundcard.dtbo /boot/overlays
-
+echo -e "\n\n****************************************************"
+echo "please run rsetup to install the dtbo file after this script finished"
+echo "select Overlays - Install 3rd party overlay - wm8960-soundcard.dtbo"
+echo -e "****************************************************\n\n"
 
 #set kernel moduels
 grep -q "i2c-dev" /etc/modules || \
@@ -60,17 +62,6 @@ grep -q "snd-soc-wm8960" /etc/modules || \
   echo "snd-soc-wm8960" >> /etc/modules  
 grep -q "snd-soc-wm8960-soundcard" /etc/modules || \
   echo "snd-soc-wm8960-soundcard" >> /etc/modules  
-  
-#set dtoverlays
-sed -i -e 's:#dtparam=i2c_arm=on:dtparam=i2c_arm=on:g'  /boot/config.txt || true
-grep -q "dtoverlay=i2s-mmap" /boot/config.txt || \
-  echo "dtoverlay=i2s-mmap" >> /boot/config.txt
-
-grep -q "dtparam=i2s=on" /boot/config.txt || \
-  echo "dtparam=i2s=on" >> /boot/config.txt
-
-#grep -q "dtoverlay=wm8960-soundcard" /boot/config.txt || \
-#  echo "dtoverlay=wm8960-soundcard" >> /boot/config.txt
   
 #install config files
 mkdir /etc/wm8960-soundcard || true
@@ -84,6 +75,6 @@ systemctl enable  wm8960-soundcard.service
 systemctl start wm8960-soundcard                                
 
 echo "------------------------------------------------------"
-echo "Please reboot your raspberry pi to apply all settings"
+echo "Please reboot your device to apply all settings"
 echo "Enjoy!"
 echo "------------------------------------------------------"

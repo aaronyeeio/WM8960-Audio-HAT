@@ -13,5 +13,5 @@ clean:
 
 install:
 	sudo cp snd-soc-wm8960.ko /lib/modules/$(shell uname -r)/kernel/sound/soc/codecs/
-	sudo cp snd-soc-wm8960-soundcard.ko /lib/modules/$(shell uname -r)/kernel/sound/soc/bcm/
+	sudo cp snd-soc-wm8960-soundcard.ko /lib/modules/$(shell uname -r)/kernel/sound/soc/rockchip/
 	sudo depmod -a

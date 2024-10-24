@@ -2,46 +2,61 @@
 /plugin/;
 
 / {
-    compatible = "brcm,bcm2708";
+    metadata {
+		title = "Enable WM8960-Audio-HAT";
+		compatible = "radxa,zero3";
+		category = "audio";
+		exclusive = "wm8960 wm8960-soundcard";
+		description = "Enable WM8960-Audio-HAT.";
+	};
 
+    // Configure I2S controller
     fragment@0 {
-        target = <&i2s>;
+        target = <&i2s3_2ch>;  // Changed to correct I2S node name
         __overlay__ {
             status = "okay";
+            assigned-clocks = <&cru 0x53>, <&cru 0x57>; // <&cru MCLK_I2S3_2CH_TX>, <&cru MCLK_I2S3_2CH_RX>
+            assigned-clock-rates = <12288000>, <12288000>;
         };
     };
+
+    // Configure main MCLK
     fragment@1 {
-		target-path="/";
-		__overlay__ {
-                        wm8960_mclk: wm8960_mclk {
-                                compatible = "fixed-clock";
-                                #clock-cells = <0>;
-                                clock-frequency = <12288000>;
-                        };
-
-		};
+        target-path="/";
+        __overlay__ {
+            wm8960_mclk: wm8960_mclk {
+                compatible = "fixed-clock";
+                #clock-cells = <0>;
+                clock-frequency = <12288000>;
+            };
+        };
     };
+
+    // Configure I2C and WM8960
     fragment@2 {
-		target = <&i2c1>;
-		__overlay__ {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			status = "okay";
+        target = <&i2c3>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+            pinctrl-names = "default";
+			pinctrl-0 = <&i2c3m0_xfer>;
 
-			wm8960: wm8960{
-				compatible = "wlf,wm8960";
-				reg = <0x1a>;
-				#sound-dai-cells = <0>;
-				AVDD-supply = <&vdd_5v0_reg>;
-				DVDD-supply = <&vdd_3v3_reg>;
-			};
-		};
+            wm8960: wm8960{
+                compatible = "wlf,wm8960";
+                reg = <0x1a>;
+                #sound-dai-cells = <0>;
+                AVDD-supply = <&vcc5v0_sys>;
+                DVDD-supply = <&vcc3v3_sys>;
+            };
+        };
     };
 
-
+    // Create the sound node
     fragment@3 {
-        target = <&sound>;
-        slave_overlay: __overlay__ {
+        target-path = "/";
+        __overlay__ {
+            slave_overlay: sound {
                 compatible = "simple-audio-card";
                 simple-audio-card,format = "i2s";
                 simple-audio-card,name = "wm8960-soundcard"; 
@@ -62,18 +77,16 @@
                         "RINPUT1", "Mic Jack",
                         "RINPUT2", "Mic Jack";
 
-
-
-
                 simple-audio-card,cpu {
-                    sound-dai = <&i2s>;
+                    sound-dai = <&i2s3_2ch>;  // Changed to match I2S node name
                 };
+
                 dailink0_slave: simple-audio-card,codec {
                     sound-dai = <&wm8960>;
-			clocks = <&wm8960_mclk>;
-			clock-names = "mclk";
-
+                    clocks = <&wm8960_mclk>;
+                    clock-names = "mclk";
                 };
+            };
         };
     };
 
@@ -83,4 +96,3 @@
         master = <0>,"=2!3";
     };
 };
-
