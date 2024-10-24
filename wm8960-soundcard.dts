@@ -39,10 +39,10 @@
             #address-cells = <1>;
             #size-cells = <0>;
             status = "okay";
-            pinctrl-names = "default";
-			pinctrl-0 = <&i2c3m0_xfer>;
 
             wm8960: wm8960{
+                pinctrl-names = "default";
+				pinctrl-0 = <&i2c3m0_xfer>;
                 compatible = "wlf,wm8960";
                 reg = <0x1a>;
                 #sound-dai-cells = <0>;
