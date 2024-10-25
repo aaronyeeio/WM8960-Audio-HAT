@@ -5,17 +5,16 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-is_Raspberry=$(cat /proc/device-tree/model | awk  '{print $1}')
-if [ "x${is_Raspberry}" != "xRaspberry" ] ; then
-  echo "Sorry, this drivers only works on raspberry pi"
+is_Radxa=$(cat /proc/device-tree/model | awk  '{print $1}')
+if [ "x${is_Radxa}" != "xRadxa" ] ; then
+  echo "Sorry, this drivers only works on Radxa ZERO 3"
   exit 1
 fi
 
 uname_r=$(uname -r)
 
 echo "remove dtbos"
-rm  /boot/overlays/wm8960-soundcard.dtbo || true
-sed -i '/dtoverlay=wm8960-soundcard/d' /boot/config.txt
+rm  /boot/overlay-user/wm8960-soundcard.dtbo || true
 
 echo "remove alsa configs"
 rm -rf  /etc/wm8960-soundcard/ || true
@@ -40,6 +39,6 @@ sed -i '/snd-soc-wm8960/d' /etc/modules
 sed -i '/snd-soc-wm8960-soundcard/d' /etc/modules
 
 echo "------------------------------------------------------"
-echo "Please reboot your raspberry pi to apply all settings"
+echo "Please reboot your device to apply all settings"
 echo "Thank you!"
 echo "------------------------------------------------------"
