@@ -24,4 +24,4 @@ do
     sleep 3
 done
 
-alsactl restore
+alsactl restore || true
